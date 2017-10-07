@@ -61,3 +61,11 @@ func (gdb *GossipDb) Set(m []byte) {
 		notify: nil,
 	})
 }
+
+func (gdb *GossipDb) Members() []string {
+	a := []string{}
+	for _, m := range gdb.members.Members() {
+		a = append(a, m.Name)
+	}
+	return a
+}
