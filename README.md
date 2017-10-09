@@ -25,6 +25,19 @@ Todos
 8. Benchmarking
 9. Example usage
 
+## Building
+
+CI Status: ![Travis CI](https://travis-ci.org/timusg/gossipdb.svg?branch=master)
+
+``
+try,
+  make init
+  make deps
+  make test (or clean)
+or,
+  make
+```
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
