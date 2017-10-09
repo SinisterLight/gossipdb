@@ -25,6 +25,17 @@ Todos
 8. Benchmarking
 9. Example usage
 
+## Building
+
+``
+try,
+  make init
+  make deps
+  make test (or clean)
+or,
+  make
+```
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
