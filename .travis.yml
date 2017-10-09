@@ -1,8 +1,6 @@
 language: go
 go:
  - 1.8.1
- - release
- - tip
  
 install:
   - go get -v github.com/Masterminds/glide
