@@ -27,6 +27,8 @@ Todos
 
 ## Building
 
+CI Status: ![Travis CI](https://travis-ci.org/timusg/gossipdb.svg?branch=master)
+
 ``
 try,
   make init
