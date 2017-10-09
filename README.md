@@ -27,9 +27,9 @@ Todos
 
 ## Building
 
-CI Status: ![Travis CI](https://travis-ci.org/timusg/gossipdb.svg?branch=master)
+CI Status: ![Travis CI](https://travis-ci.org/SinisterLight/gossipdb.svg?branch=master)
 
-``
+```
 try,
   make init
   make deps
