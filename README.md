@@ -9,6 +9,39 @@ gossipdb provides the replication and in-memory persistance layer for
 the nodes of the cluster. It provides APIs to put and fetch data in
 a key value pair. It also provides an API to fetch the active members of the cluster.
 
+## Example
+
+The 'example' directory contains an example application which has can be
+used to add keys using an API call and fetching it from any of the
+nodes.
+
+You can build the example using the following steps:
+```
+cd example
+glide install
+go build
+```
+
+You then need to run two instances of the app on different tabs of your
+terminal:
+```
+./example -http_port 8000 -rpc_port 9000 -members
+'0.0.0.0:9000,0.0.0.0:9001'
+
+./example -http_port 8001 -rpc_port 9001 -members
+'0.0.0.0:9000,0.0.0.0:9001'
+```
+
+Sample payload for the '/add_key' API is shown below:
+```
+{
+"key": "ping",
+"value": "pong"
+}
+```
+
+The key can then be fetched by using the query '/value?key=ping' 
+
 ## Roadmap
 
 GossipDb is currently an early alpha project. Api interface is likely to
