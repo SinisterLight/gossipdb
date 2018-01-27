@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -25,9 +24,10 @@ type keyValue struct {
 
 func main() {
 	flag.Parse()
-
-	gossipDb, _ := gossipdb.NewGossipDb(*members, *rpc_port, &keyParser{})
-
+	gossipDb, err := gossipdb.NewGossipDb(*members, *rpc_port)
+	if err != nil {
+		fmt.Println(err)
+	}
 	http.HandleFunc("/value", getValueHandler(gossipDb))
 	http.HandleFunc("/", clusterHealthHandler(gossipDb))
 	http.HandleFunc("/add_key", addKeyHandler(gossipDb))
@@ -45,7 +45,10 @@ func addKeyHandler(g *gossipdb.GossipDb) http.HandlerFunc {
 		if err != nil {
 			fmt.Println(err)
 		}
-		g.Set(body)
+		var data keyValue
+		json.Unmarshal(body, &data)
+		g.Set(data.Key, data.Value)
+		json.NewEncoder(w).Encode(data)
 	}
 }
 
@@ -57,26 +60,7 @@ func clusterHealthHandler(g *gossipdb.GossipDb) http.HandlerFunc {
 
 func getValueHandler(g *gossipdb.GossipDb) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var data keyValue
-		val, found := g.Get(r.FormValue("key"))
-		if found {
-			err := json.Unmarshal(val, &data)
-			if err != nil {
-				fmt.Println(err)
-			}
-			fmt.Println(data.Value)
-			json.NewEncoder(w).Encode(data)
-		}
+		val, _ := g.Get(r.FormValue("key"))
+		json.NewEncoder(w).Encode(val)
 	}
-}
-
-type keyParser struct{}
-
-func (p *keyParser) ToKey(b []byte) string {
-	var data keyValue
-	if err := json.NewDecoder(bytes.NewReader(b)).Decode(&data); err != nil {
-		fmt.Println(err)
-		return ""
-	}
-	return data.Key
 }

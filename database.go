@@ -14,11 +14,14 @@ func newDb() *db {
 	}
 }
 
-func (d *db) Save(k string, b []byte) {
+func (d *db) Save(k string, b string) {
 	d.connection.Set(k, b, cache.DefaultExpiration)
 }
 
-func (d *db) Get(k string) ([]byte, bool) {
+func (d *db) Get(k string) (string, bool) {
 	v, f := d.connection.Get(k)
-	return v.([]byte), f
+	if f {
+		return v.(string), f
+	}
+	return "nil", false
 }
