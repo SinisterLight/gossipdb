@@ -80,3 +80,7 @@ func (gdb *GossipDb) Members() []string {
 	}
 	return a
 }
+
+func (gdb *GossipDb) Shutdown() {
+	gdb.members.Shutdown()
+}
