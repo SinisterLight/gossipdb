@@ -18,15 +18,15 @@ var (
 )
 
 type keyValue struct {
-	Key   string `json:"key"`
-	Value string `json:"value"`
+	Key   string      `json:"key"`
+	Value interface{} `json:"value"`
 }
 
 func main() {
 	flag.Parse()
 	gossipDb, err := gossipdb.NewGossipDb(*members, *rpc_port)
 	if err != nil {
-		fmt.Println(err)
+		panic(err)
 	}
 	http.HandleFunc("/value", getValueHandler(gossipDb))
 	http.HandleFunc("/", clusterHealthHandler(gossipDb))

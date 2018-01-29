@@ -8,7 +8,7 @@ import (
 
 type Pair struct {
 	Key   string
-	Value string
+	Value interface{}
 }
 
 type GossipDb struct {
@@ -51,15 +51,12 @@ func NewGossipDb(members string, port int) (*GossipDb, error) {
 	}, nil
 }
 
-func (gdb *GossipDb) Get(k string) (string, bool) {
+func (gdb *GossipDb) Get(k string) (interface{}, bool) {
 	value, found := gdb.database.Get(k)
-	if found {
-		return value, found
-	}
-	return "nil", found
+	return value, found
 }
 
-func (gdb *GossipDb) Set(key string, value string) {
+func (gdb *GossipDb) Set(key string, value interface{}) {
 	gdb.database.Save(key, value)
 	pair := &Pair{Key: key, Value: value}
 	message, err := json.Marshal(pair)

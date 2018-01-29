@@ -41,7 +41,7 @@ func TestGetWhenKeyIsNotFound(t *testing.T) {
 	gossipDb, _ := NewGossipDb("", 9000)
 	value, found := gossipDb.Get("ping")
 	assert.False(t, found)
-	assert.Equal(t, value, "nil")
+	assert.Equal(t, value, nil)
 	defer gossipDb.Shutdown()
 }
 
