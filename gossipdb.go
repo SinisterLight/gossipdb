@@ -1,21 +1,23 @@
 package gossipdb
 
 import (
+	"encoding/json"
+	"fmt"
 	"github.com/hashicorp/memberlist"
 )
 
-type KeyParser interface {
-	ToKey(b []byte) string
+type Pair struct {
+	Key   string
+	Value interface{}
 }
 
 type GossipDb struct {
 	members    *memberlist.Memberlist
 	broadcasts *memberlist.TransmitLimitedQueue
 	database   *db
-	keyParser  KeyParser
 }
 
-func NewGossipDb(members string, port int, k KeyParser) (*GossipDb, error) {
+func NewGossipDb(members string, port int) (*GossipDb, error) {
 	d := newDb()
 
 	b := &memberlist.TransmitLimitedQueue{
@@ -27,8 +29,9 @@ func NewGossipDb(members string, port int, k KeyParser) (*GossipDb, error) {
 			return b.GetBroadcasts(overhead, limit)
 		},
 		notifyMsg: func(b []byte) {
-			k := k.ToKey(b)
-			d.Save(k, b)
+			pair := &Pair{}
+			json.Unmarshal(b, pair)
+			d.Save(pair.Key, pair.Value)
 		},
 	}
 
@@ -45,19 +48,24 @@ func NewGossipDb(members string, port int, k KeyParser) (*GossipDb, error) {
 		members:    m,
 		broadcasts: b,
 		database:   d,
-		keyParser:  k,
 	}, nil
 }
 
-func (gdb *GossipDb) Get(k string) ([]byte, bool) {
-	return gdb.database.Get(k)
+func (gdb *GossipDb) Get(k string) (interface{}, bool) {
+	value, found := gdb.database.Get(k)
+	return value, found
 }
 
-func (gdb *GossipDb) Set(m []byte) {
-	k := gdb.keyParser.ToKey(m)
-	gdb.database.Save(k, m)
+func (gdb *GossipDb) Set(key string, value interface{}) {
+	gdb.database.Save(key, value)
+	pair := &Pair{Key: key, Value: value}
+	message, err := json.Marshal(pair)
+	if err != nil {
+		fmt.Println(err)
+	}
+
 	gdb.broadcasts.QueueBroadcast(&broadcast{
-		msg:    m,
+		msg:    message,
 		notify: nil,
 	})
 }
@@ -68,4 +76,8 @@ func (gdb *GossipDb) Members() []string {
 		a = append(a, m.Name)
 	}
 	return a
+}
+
+func (gdb *GossipDb) Shutdown() {
+	gdb.members.Shutdown()
 }
